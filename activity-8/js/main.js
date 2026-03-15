@@ -19,4 +19,30 @@ window.onload = function(){
         .attr('x', 50) // x attribute sets position in pixels from the left
         .attr('y', 50) // y attribute sets position in pixels from the top
         .style('fill', '#fff'); // Sets a fill color.
+
+    var cityPop = [
+    {city: 'Madison', population: 233209},
+    {city: 'Milwaukee', population: 594833},
+    {city: 'Green Bay', population: 104057},
+    {city: 'Superior', population: 27244}
+    ];
+
+    var circles = container.selectAll('.circles') // The circles class can still be selected despite not existing yet. It just creates an empty selection. Best practice to set selector name to the class you'll eventually assign the element.
+        .data(cityPop) // Applies the given datum to the selection
+        .enter() // Joins the data to the selection
+        .append('circle') // Adds a circle tag for each datum in the array
+        .attr('class', 'circles') // Applies the circles class to all circles.
+        .attr('id', function(datum){
+            return datum.city;
+        })
+        .attr('r', function(datum){ // Sets the radius attribute of the svg circles. Uses a function based on the population attribute of the cities.
+            var area = datum.population * 0.01;
+            return Math.sqrt(area / Math.PI);
+        })
+        .attr('cx', function(datum, index){ // Sets the center X attribute of the svg circles. Uses the index to space the circles evenly
+            return 90 + (index * 175);
+        })
+        .attr('cy', function(datum){ // Sets the center y attribute of the svg circles. Uses and scales the population to determine their offset from the top.
+            return 450 - (datum.population * 0.0005);
+        });
 }
