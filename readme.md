@@ -1,0 +1,1 @@
+Lab 3 Dataset: [Baseline Resilience Indicators for Communities (BRIC) Index](https://sc.edu/study/colleges_schools/artsandsciences/centers_and_institutes/hvri/data_and_resources/bric/) from the University of South Carolina.
