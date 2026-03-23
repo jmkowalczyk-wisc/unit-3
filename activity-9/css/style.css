@@ -1,19 +1,19 @@
 /* Activity 8 Stylesheet - Joseph Kowalczyk, 2026 */
 
-.axis path, .axis line {
-    fill: none;
-    stroke: black;
-    stroke-width: 1px;
-    shape-rendering: crispEdges;
+.states {
+    fill: #f0f0f0; /* Sets the fill color of the states class to white */
+    stroke: #ccc; /* Sets the stroke/line color of the states class to light grey */
+    stroke-width: 1px; /* Sets the width of the lines of the states class class to 1 pixel. */
 }
 
-.axis text {
-    font-family: sans-serif;
-    font-size: 0.9em;
+.counties {
+    stroke: #fff; /* Sets the stroke/line color of the counties class to white */
+    stroke-width: 0.5px; /* Sets the width of the lines of the states class class to 0.5 pixel. */
+    fill: #050; /* THIS IS TEMPORARY UNTIL INTERACTIVITY IS IMPLEMENTED. Sets the fill color of the counties to green. */
 }
 
-.title {
-    font-family: sans-serif;
-    font-size: 1.5em;
-    font-weight: bold;
+.map {
+    border: medium solid #999; /* Adds a border to the entire map <svg> */
+    margin: 10px 0 0 20px; /* Moves the map <svg> away from the edge of the window */
+    background: #ccd9f0; /* Gives the map a flat background color */
 }
