@@ -9,7 +9,7 @@
 .counties {
     stroke: #fff; /* Sets the stroke/line color of the counties class to white */
     stroke-width: 0.5px; /* Sets the width of the lines of the states class class to 0.5 pixel. */
-    fill: #050; /* THIS IS TEMPORARY UNTIL INTERACTIVITY IS IMPLEMENTED. Sets the fill color of the counties to green. */
+    fill: #2ca25f; /* THIS IS TEMPORARY UNTIL INTERACTIVITY IS IMPLEMENTED. Sets the fill color of the counties to green. */
 }
 
 .map {
