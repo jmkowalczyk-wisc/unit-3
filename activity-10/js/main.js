@@ -65,7 +65,9 @@
 
             countyShapes = joinData(countyShapes, csvData); // Joins BRIC csv data to county topoJSON
 
-            setEnumerationUnits(countyShapes, map, path); // Adds individually interactable counties to the map.
+            var colorScale = makeColorScale(csvData) // Generates the color scale given the data in csvData
+
+            setEnumerationUnits(countyShapes, map, path, colorScale); // Adds individually interactable counties to the map.
 
         }
     }
@@ -95,9 +97,36 @@
         return countyShapes;
     }
 
-    // Color Scale function goes here
+    // Creates color scale generator
+    function makeColorScale(data) {
+        // Establish array of colors to be iterated between
+        var colorClasses = [             
+            '#ffffcc',
+            '#c2e699',
+            '#78c679',
+            '#31a354',
+            '#006837' 
+        ];
+        // Creates the d3 generator for the scale
+        var colorScale = d3.scaleQuantile()
+            .range(colorClasses); // Maximum range of the scale's output, i.e., can only output within the five values set in colorClasses
 
-    function setEnumerationUnits(countyShapes, map, path) {
+        // Build array of all values of the currently expressed attribute
+        // NOTE: Figure out which scale would work best
+        var domainArray = [];
+        for (var i = 0; i < data.length; i++) { // For each row i in the provided data...
+            var val = parseFloat(data[i][expressed]) // Converts the string data in the current row and expressed attribute to a float
+            domainArray.push(val); // Adds the current float from the loop to the end of domainArray
+        };
+
+        // Assign array of expressed values of as the domain of the scale
+        colorScale.domain(domainArray);
+
+        // Return the completed color scale
+        return colorScale
+    };
+
+    function setEnumerationUnits(countyShapes, map, path, colorScale) {
         // Adding counties to the maps. These need to be individually interactable.
         var counties = map
             .selectAll('.counties') // Creates empty selection by selecting a class ahead of its creation
@@ -107,7 +136,15 @@
             .attr('class', function(d){ // Adds two classes to each feature: counties, which is selected earlier, and the name of the county.
                 return "counties " + d.properties.COUNTYNAME;
             })
-            .attr('d', path); // Adds path data.
+            .attr('d', path) // Adds path data.
+            .style('fill', function(d){ // Sets the fill color based on the color scale established earlier.
+                var value = d.properties[expressed]; // Stores the value of a county's expressed variable
+                if (value) { // If a county's expressed variable exists...
+                    return colorScale(d.properties[expressed]) // Color the county based on the color scale
+                } else { // If a county's expressed variable does not exist...
+                    return '#ccc' // Color the county light gray.
+                }
+            });
     }
 
 })(); // Must always be the last line. Closes and executes the anonymous function wrapping main.json
