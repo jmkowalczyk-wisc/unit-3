@@ -3,8 +3,13 @@
     
     // Pseudo-global variables, technically local because the entire script is wrapped in one anonymous function.
     // Variables from the BRIC data to join to the county data
-    var attrArray = ["SOCIAL", "ECONOM", "HOUSING/INFRA", "COMM CAPITAL", "INSTITUTIONAL", "ENVIRONMENT", "TOT RESIL2020"];
-    var expressed = attrArray[0]; // Initial attribute of attrArray
+    var attrArray = ["SOCIAL", "ECONOM", "HOUSING/INFRA", "COMM CAPITAL", "INSTITUTIONAL", "ENVIRONMENT"];
+    // Object containing different expressed variables
+    var expressed = {
+        x: attrArray[2], // x attribute
+        y: attrArray[0], // y attribute
+        color: attrArray[1] // Color and size attribute
+    }
 
     // Start script once window loads
     window.onload = initMap();
@@ -12,7 +17,7 @@
     // Initialize choropleth map
     function initMap() {
         // Dimensions of map frame
-        var width = 960,
+        var width = window.innerWidth * 0.5 - 25, // Reads the internal width of the browser frame
             height = 460;
 
         // SVG container for map
@@ -69,8 +74,76 @@
 
             setEnumerationUnits(countyShapes, map, path, colorScale); // Adds individually interactable counties to the map.
 
+            setChart(csvData, colorScale);
         }
     }
+
+    // Creates the supplementary coordinated bubble chart
+    function setChart (csvData, colorScale){
+        // Dimensions
+        var chartWidth = window.innerWidth * 0.5 - 25, // Reads the internal width of the browser frame
+            chartHeight = 460;
+        
+        // Create svg element to hold the bubble chart
+        var chart = d3.select('body')
+            .append('svg')
+            .attr('width', chartWidth)
+            .attr('height', chartHeight)
+            .attr('class', 'chart');
+
+        // Create scale to place circles proportionally on y-axis
+        var yScale = d3.scaleLinear()
+            .range([chartHeight, 0]) // Bound of yScale's output
+            .domain([0, 1]) // Bound of yScale's input
+        // Likewise, but for x axis
+        var xScale = d3.scaleLinear()
+            .range([0,chartWidth])
+            .domain([0, 1])
+        // Because every value passed to the setChart function is below 1, a d3 scale is needed to scale the circles properly.
+        var radiusScale = d3.scalePow()
+            .exponent(0.5715) // Flannery scaling exponent
+            .domain([0, d3.max(csvData, function(d){ // Sets the maximum of the domain to the highest value found in the expressed color variable
+                return parseFloat(d[expressed.color]);
+            })])
+            .range([1, 7]) // Minimum and maximum circle radius
+
+        // Create axes generators
+        var yAxisScale = d3.axisRight().scale(yScale);
+        var xAxisScale = d3.axisTop().scale(xScale);
+
+        // Place Axes
+        var yaxis = chart.append('g')
+            .attr('class', 'yaxis')
+            .call(yAxisScale);
+
+        var xaxis = chart.append('g')
+            .attr('class', 'xaxis')
+            .attr('transform', 'translate(0,' + chartHeight + ')')
+            .call(xAxisScale);
+
+        // Create circles for each county
+        var circles = chart.selectAll('.circles') // Empty selection inside of the chart container
+            .data(csvData) // Give the chart function the data in the csv
+            .enter() // Needed for d3 to process the previous line
+            .append('circle') // Append a circle for each entry in csvData, should be ~100 circles
+            .attr('class', 'circles')
+            .attr('class', function(d){ // Adds two more classes to each circle, bubble and the name of the county
+                return 'bubble ' + d.County;
+            })
+            .attr('r', function(d){ // Varies the size of the bubbles based on the expressed color variable
+                return radiusScale(parseFloat(d[expressed.color]));
+            })
+            .attr('cx', function(d, i){ // Varies the x position of the bubbles based on the expressed x variable
+                return xScale(parseFloat(d[expressed.x]));
+            })
+            .attr('cy', function(d){ // Varies the y position of the bubbles based on the expressed y variable
+                return yScale(parseFloat(d[expressed.y]));
+            })
+            .attr('fill', function(d){ // Varies the color of the bubbles based on the expressed color variable
+                return colorScale(parseFloat(d[expressed.color]));
+            });
+    };
+
     // Joins BRIC csv data to the county topojson
     function joinData(countyShapes, csvData) {
         // Loop through BRIC data to assign each set of CSV attribute values to the topojson counties
@@ -112,10 +185,9 @@
             .range(colorClasses); // Maximum range of the scale's output, i.e., can only output within the five values set in colorClasses
 
         // Build array of all values of the currently expressed attribute
-        // NOTE: Figure out which scale would work best
         var domainArray = [];
         for (var i = 0; i < data.length; i++) { // For each row i in the provided data...
-            var val = parseFloat(data[i][expressed]) // Converts the string data in the current row and expressed attribute to a float
+            var val = parseFloat(data[i][expressed.color]) // Converts the string data in the current row and expressed attribute to a float
             domainArray.push(val); // Adds the current float from the loop to the end of domainArray
         };
 
@@ -138,9 +210,9 @@
             })
             .attr('d', path) // Adds path data.
             .style('fill', function(d){ // Sets the fill color based on the color scale established earlier.
-                var value = d.properties[expressed]; // Stores the value of a county's expressed variable
+                var value = d.properties[expressed.color]; // Stores the value of a county's expressed variable
                 if (value) { // If a county's expressed variable exists...
-                    return colorScale(d.properties[expressed]) // Color the county based on the color scale
+                    return colorScale(d.properties[expressed.color]) // Color the county based on the color scale
                 } else { // If a county's expressed variable does not exist...
                     return '#ccc' // Color the county light gray.
                 }

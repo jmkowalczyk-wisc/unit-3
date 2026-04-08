@@ -13,6 +13,14 @@
 
 .map {
     border: medium solid #999; /* Adds a border to the entire map <svg> */
-    margin: 10px 0 0 20px; /* Moves the map <svg> away from the edge of the window */
+    margin: 5px 0 0 20px; /* Moves the map <svg> away from the edge of the window */
     background: #ccd9f0; /* Gives the map a flat background color */
+}
+
+.chart {
+    background-color: rgba(128, 128, 128, .2); /* Adds a background color to the entire chart <svg> */
+    border: medium solid #999; /* Adds a border to the entire chart <svg> */
+    float: right; /* Makes the chart <svg> align to the right side of the browser window */
+    margin: 5px 0 0 0; /* Moves the chart <svg> away from the edge of the window */
+
 }
