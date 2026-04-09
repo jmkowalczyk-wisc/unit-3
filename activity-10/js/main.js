@@ -78,6 +78,46 @@
         }
     }
 
+// Calculate minimum and maximum values for expressed variables, used in scale functions
+function getDataValues(csvData, expressedValue) {
+    var max = d3.max(csvData, function(d){ // Max value
+        return parseFloat(d[expressedValue])
+    });
+    var min = d3.min(csvData, function(d){ // Min value
+        return parseFloat(d[expressedValue])
+    });
+    var range = max - min,
+        adjustment = range / csvData.length // Offset so no circles are cut off by the scale.
+    return [min-adjustment, max + adjustment]
+}
+// Create y scale
+function createYScale(csvData, chartHeight) {
+    var dataMinMax = getDataValues(csvData, expressed.y) // Calculate minimums and maximums
+    return yScale = d3.scaleLinear().range([0, chartHeight]).domain([dataMinMax[1], dataMinMax[0]]); // Creates scale generator
+}
+// Create x scale
+function createXScale(csvData, chartWidth) {
+    	var dataMinMax =  getDataValues(csvData, expressed.x) // Calculate minimums and maximums
+        return xScale = d3.scaleLinear().range([0, chartWidth]).domain([dataMinMax[0], dataMinMax[1]]); // Creates scale generator
+}
+
+// Create chart axes
+function createChartAxes (chart, chartHeight, yScale, xScale) {
+    // Create axes generators
+    var yAxisScale = d3.axisRight().scale(yScale);
+    var xAxisScale = d3.axisTop().scale(xScale);
+
+    // Place Axes
+    var yaxis = chart.append('g')
+        .attr('class', 'yaxis')
+        .call(yAxisScale);
+
+    var xaxis = chart.append('g')
+        .attr('class', 'xaxis')
+        .attr('transform', 'translate(0,' + chartHeight + ')')
+        .call(xAxisScale);
+}
+
     // Creates the supplementary coordinated bubble chart
     function setChart (csvData, colorScale){
         // Dimensions
@@ -91,15 +131,12 @@
             .attr('height', chartHeight)
             .attr('class', 'chart');
 
-        // Create scale to place circles proportionally on y-axis
-        var yScale = d3.scaleLinear()
-            .range([chartHeight, 0]) // Bound of yScale's output
-            .domain([0, 1]) // Bound of yScale's input
-        // Likewise, but for x axis
-        var xScale = d3.scaleLinear()
-            .range([0,chartWidth])
-            .domain([0, 1])
+        // Create scale to place circles proportionally on the axes
+        var yScale = createYScale(csvData, chartHeight);
+        var xScale = createXScale(csvData, chartWidth);
+
         // Because every value passed to the setChart function is below 1, a d3 scale is needed to scale the circles properly.
+        // TODO: The expressed variables in the BRIC set do not vary much in some cases (i.e., hundredths and below). Find a scaling method that makes the difference between enumerations more obvious.
         var radiusScale = d3.scalePow()
             .exponent(0.5715) // Flannery scaling exponent
             .domain([0, d3.max(csvData, function(d){ // Sets the maximum of the domain to the highest value found in the expressed color variable
@@ -107,19 +144,8 @@
             })])
             .range([1, 7]) // Minimum and maximum circle radius
 
-        // Create axes generators
-        var yAxisScale = d3.axisRight().scale(yScale);
-        var xAxisScale = d3.axisTop().scale(xScale);
-
-        // Place Axes
-        var yaxis = chart.append('g')
-            .attr('class', 'yaxis')
-            .call(yAxisScale);
-
-        var xaxis = chart.append('g')
-            .attr('class', 'xaxis')
-            .attr('transform', 'translate(0,' + chartHeight + ')')
-            .call(xAxisScale);
+        // Add chart axes to chart
+        createChartAxes(chart, chartHeight, yScale, xScale);
 
         // Create circles for each county
         var circles = chart.selectAll('.circles') // Empty selection inside of the chart container
@@ -141,7 +167,8 @@
             })
             .attr('fill', function(d){ // Varies the color of the bubbles based on the expressed color variable
                 return colorScale(parseFloat(d[expressed.color]));
-            });
+            })
+            .attr('opacity', 0.7); // Might be temporary, circles tend to overlap even with the dynamic x and y scales
     };
 
     // Joins BRIC csv data to the county topojson
@@ -218,5 +245,4 @@
                 }
             });
     }
-
 })(); // Must always be the last line. Closes and executes the anonymous function wrapping main.json
