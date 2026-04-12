@@ -1,0 +1,52 @@
+/* Activity 10 Stylesheet - Joseph Kowalczyk, 2026 */
+
+.states {
+    fill: #f0f0f0; /* Sets the fill color of the states class to white */
+    stroke: #ccc; /* Sets the stroke/line color of the states class to light grey */
+    stroke-width: 1px; /* Sets the width of the lines of the states class class to 1 pixel. */
+}
+
+.counties {
+    stroke: #fff; /* Sets the stroke/line color of the counties class to white */
+    stroke-width: 0.5px; /* Sets the width of the lines of the states class class to 0.5 pixel. */
+}
+
+.map {
+    border: medium solid #999; /* Adds a border to the entire map <svg> */
+    margin: 5px 0 0 20px; /* Moves the map <svg> away from the edge of the window */
+    background: #ccd9f0; /* Gives the map a flat background color */
+}
+
+.chart {
+    background-color: rgba(128, 128, 128, .2); /* Adds a background color to the entire chart <svg> */
+    border: medium solid #999; /* Adds a border to the entire chart <svg> */
+    float: right; /* Makes the chart <svg> align to the right side of the browser window */
+    margin: 5px 0 0 0; /* Moves the chart <svg> away from the edge of the window */
+
+}
+
+.navbar {
+    top: 0; /* Sets the vertical position of the element to y = 0, top of the window */
+    left: 0; /* Sets the horizontal position of the element to x = 0, left side of the window */
+    background: lightgrey; /* Sets the background color to lightgrey. */
+    padding: 20px; /* Positions the edges of the element 20px away from other elements. */
+}
+
+.dropdown {
+    z-index: 10; /* Ensures the element appears above other elements, namely the navbar. */
+    font-family: sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 2px;
+    border: 2px solid #999;
+    box-shadow: 2px 2px 4px #999;
+    margin-right: 15px;
+}
+
+option {
+    font-weight: normal;
+}
+
+.dropdown-label{
+    display: inline;
+}
