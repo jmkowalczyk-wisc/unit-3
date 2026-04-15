@@ -11,7 +11,7 @@
         color: attrArray[1] // Color and size attribute
     }
     // Chart frame dimensions
-    var chartWidth = window.innerWidth * 0.5 - 25, // Reads the internal width of the browser frame
+    var chartWidth = window.innerWidth * 0.5 - 50, // Reads the internal width of the browser frame
         chartHeight = 460;
 
     // Start script once window loads
@@ -20,7 +20,7 @@
     // Initialize choropleth map
     function initMap() {
         // Dimensions of map frame
-        var width = window.innerWidth * 0.5 - 25, // Reads the internal width of the browser frame
+        var width = window.innerWidth * 0.5 - 50, // Reads the internal width of the browser frame
             height = 460;
 
         // SVG container for map
@@ -170,7 +170,13 @@
             .attr('fill', function(d){ // Varies the color of the bubbles based on the expressed color variable
                 return colorScale(parseFloat(d[expressed.color]));
             })
-            .attr('opacity', 0.7); // Might be temporary, circles tend to overlap even with the dynamic x and y scales
+            .attr('opacity', 0.7) // Might be temporary, circles tend to overlap even with the dynamic x and y scales
+            .on("mouseover", function (event, d) {
+                highlight({COUNTYNAME: d.County}); // Name of county is COUNTYNAME in the topojson, but County in the csv. Passing d.County in an object with a COUNTYNAME attribute makes this work.
+            })
+            .on("mouseout", function (event, d) {
+                dehighlight({COUNTYNAME: d.County}); // Name of county is COUNTYNAME in the topojson, but County in the csv. Passing d.County in an object with a COUNTYNAME attribute makes this work.
+            });
     };
 
     // Joins BRIC csv data to the county topojson
@@ -245,6 +251,12 @@
                 } else { // If a county's expressed variable does not exist...
                     return '#ccc' // Color the county light gray.
                 }
+            })
+            .on('mouseover', function (event, d) { // When an enumeration unit is hovered over...
+                highlight(d.properties); // Pass its properties to the highlight() function, without passing the whole GeoJSON feature
+            })
+            .on('mouseout', function(event, d) { // When the cursor leaves an enumeration unit...
+                dehighlight(d.properties); // Pass its properties to the dehighlight() function, without passing the whole GeoJSON feature
             });
     }
 
@@ -297,7 +309,7 @@
             var colorScale = makeColorScale(csvData);
             var radiusScale = createColorScale(csvData);
 
-            // Update Axes
+            // Update axes, calls the d3.axis___ methods with the new scales.
             var xaxis = d3.select('.xaxis').call(
                 d3.axisTop(xScale)
             )
@@ -307,6 +319,8 @@
 
             // Recolor enumeration units, essentially the same as when they are initialized
             var counties = d3.selectAll('.counties')
+                .transition() // Initiates a transition, in this case smoothly switching between colors.
+                .duration(1000) // The duration of the transition, 1000 = 1 second.
                 .style('fill', function(d){
                     var value = d.properties[expressed.color] // Stores the value of a county's expressed variable
                     if (value) { // If the value for that county exists...
@@ -318,6 +332,8 @@
             
             // Recolor and resize circles
             var circles = d3.selectAll('.bubble')
+                .transition() // Initiates a transition. Transitions apply to all chained methods after itself.
+                .duration(1000)
                 // Recolor circles to match map
                 .attr('fill', function(d){
                     return colorScale(parseFloat(d[expressed.color]));
@@ -336,4 +352,24 @@
         }
     };
 
+    function highlight(props) {
+        // Add selected class to the selected element
+        var selected = d3.selectAll('.' + props.COUNTYNAME)
+            .attr('class', function (d){
+                let elemClasses = this.classList; // Get current list of classes for each element
+                elemClasses += ' selected' // Add 'selected' as a class to classList
+                return elemClasses; // Replaces the prior classList with the one with 'selected'
+            })
+        .raise() // Visually raises selected element above other elements.
+    };
+
+    function dehighlight(props) {
+        // Removes selected class from the selected element.
+        var selected = d3.selectAll('.' + props.COUNTYNAME)
+            .attr('class', function(){
+                let elemClasses = this.classList; // Get current list of classes for each element
+                elemClasses.remove('selected') // Removes 'selected' from classList
+                return elemClasses; // Replaces the prior classList with the one with 'selected'
+            })
+    };
 })(); // Must always be the last line. Closes and executes the anonymous function wrapping main.json
