@@ -45,8 +45,25 @@ option {
     font-weight: normal; /* Options in dropdowns will not be bold */
 }
 
-.dropdown-label{
-    display: inline;
+.dropdown-label {
+    display: inline; /* Displays label as an inline element.*/
+}
+
+.infolabel {
+    position: absolute;
+    height: 50px;
+    min-width: 100px;
+    color: #fff;
+    background-color: #000;
+    border: solid thin #fff;
+    padding: 5px 10px;
+}
+
+.infolabel h1 {
+    margin: 0 20px 0 0;
+    padding: 0;
+    display: inline-block;
+    line-height: 1em;
 }
 
 /* .selected must be under all other styles for priority reasons */

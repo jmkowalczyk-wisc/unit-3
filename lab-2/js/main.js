@@ -172,11 +172,14 @@
             })
             .attr('opacity', 0.7) // Might be temporary, circles tend to overlap even with the dynamic x and y scales
             .on("mouseover", function (event, d) {
-                highlight({COUNTYNAME: d.County}); // Name of county is COUNTYNAME in the topojson, but County in the csv. Passing d.County in an object with a COUNTYNAME attribute makes this work.
+                d.COUNTYNAME = d.County // Name of county is COUNTYNAME in the topojson, but County in the csv. Setting d.COUNTYNAME equal to d.County fixes this.
+                highlight(d); 
             })
             .on("mouseout", function (event, d) {
-                dehighlight({COUNTYNAME: d.County}); // Name of county is COUNTYNAME in the topojson, but County in the csv. Passing d.County in an object with a COUNTYNAME attribute makes this work.
-            });
+                d.COUNTYNAME = d.County // Name of county is COUNTYNAME in the topojson, but County in the csv. Setting d.COUNTYNAME equal to d.County fixes this.
+                dehighlight(d); 
+            })
+            .on('mousemove', moveLabel);
     };
 
     // Joins BRIC csv data to the county topojson
@@ -257,7 +260,8 @@
             })
             .on('mouseout', function(event, d) { // When the cursor leaves an enumeration unit...
                 dehighlight(d.properties); // Pass its properties to the dehighlight() function, without passing the whole GeoJSON feature
-            });
+            })
+            .on('mousemove', moveLabel);
     }
 
     // Create page title
@@ -354,6 +358,8 @@
 
     // Highlight/dehighlight functionality
     function highlight(props) {
+        // Create label via setLabel()
+        setLabel(props)
         // Add selected class to the selected element
         var selected = d3.selectAll('.' + props.COUNTYNAME.replace(/ /g, '-')) // Replaces spaces in county names with hyphens, to condense two-word counties to one class.)
             .attr('class', function (d){
@@ -365,8 +371,11 @@
     };
 
     function dehighlight(props) {
+        // Remove label made via setLabel()
+        d3.select('.infolabel')
+            .remove();
         // Removes selected class from the selected element.
-        var selected = d3.selectAll('.' + props.COUNTYNAME.replace(/ /g, '-'))
+        var selected = d3.selectAll('.' + props.COUNTYNAME.replace(/ /g, '-')) // See similar line in highlight()
             .attr('class', function(){
                 let elemClasses = this.classList; // Get current list of classes for each element
                 elemClasses.remove('selected') // Removes 'selected' from classList
@@ -376,8 +385,37 @@
 
     // Dynamic label functionality
     function setLabel(props) {
-        // Label content
+        // Set up label content, backticks avoid string concatenation and makes it more readable.
+        // Format: Expressed attribute value | County name | Expressed attribute name
+            var labelAttr = `<h1>${props[expressed.color]}</h1><b>${props.COUNTYNAME} ${expressed.color}</b>`
+        // Create infolabel div via an html string
+            var infolabel = d3.select('body')
+                .append('div')
+                .attr('class', 'infolabel')
+                .attr('id', `${props.COUNTYNAME.replace(/ /g, '-')}_label`) // See similar line in highlight()
+                .html(labelAttr);
+    }
 
-        // Create infolabel div
+    // Function to move labels with the mouse
+    function moveLabel(event, d){
+        // Get width of label via .node() and .getBoundingClientRect()
+        var labelWidth = d3.select('.infolabel')
+            .node() // Returns .infolabel's DOM node
+            .getBoundingClientRect().width; // Retrieves the width property of the size of the label
+        // Use cursor coordinates to set label coordinates
+        // event.client_, a d3 object, takes the x and y coordinates of the cursor, originating from the top left of the screen.
+        var x1 = event.clientX + 10,
+            y1 = event.clientY - 75,
+            x2 = event.clientX - labelWidth - 10, // Secondary width, in case the label would overflow to the right
+            y2 = event.clientY + 25; // Likewise, but for overflow to the top
+
+        // Setting horizontal label, checks for overflow to switch between x1 and x2
+        var x = event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
+        // Likewise, but for vertical overflow to switch between y1 and y2
+        var y = event.clientY < 75 ? y2 : y1;
+
+        d3.select('.infolabel') // Selects the infolabel class, created in setLabel().
+            .style('left', `${x}px`) // Adds "left: {x}px;" to the CSS styling of the infolabel class.
+            .style('top', `${y}px`); // Likewise, but "top: {y}px;"
     }
 })(); // Must always be the last line. Closes and executes the anonymous function wrapping main.json
