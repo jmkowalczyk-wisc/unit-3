@@ -11,8 +11,15 @@
         color: attrArray[1] // Color and size attribute
     }
     // Chart frame dimensions
-    var chartWidth = window.innerWidth * 0.5 - 50, // Reads the internal width of the browser frame
-        chartHeight = 460;
+    // window.innerWidth reads the internal width of the browser frame
+    // Checking width of the screen, if over 700px, creates chart container with the width of the screen
+    if (window.innerWidth < 700) { // If screen width is less than 700 px (i.e., phone screen)...
+        var chartWidth = window.innerWidth - 40
+    } else { // Otherwise...
+        var chartWidth = window.innerWidth * 0.5 - 55
+    }
+       
+    var chartHeight = window.innerHeight - 170;
 
     // Start script once window loads
     window.onload = initMap();
@@ -20,8 +27,13 @@
     // Initialize choropleth map
     function initMap() {
         // Dimensions of map frame
-        var width = window.innerWidth * 0.5 - 50, // Reads the internal width of the browser frame
-            height = 460;
+    if (window.innerWidth < 700) { // If screen width is less than 700 px (i.e., phone screen)...
+        var width = window.innerWidth - 40
+    } else { // Otherwise...
+        var width = window.innerWidth * 0.5 - 55
+    }
+
+    var height = window.innerHeight - 170;
 
         // SVG container for map
         var map = d3.select('#mapchart-container') // Selecting 'body' causes the chart to appear at the very end of the html, after any other html. Putting the map and the chart in their own div fixes this.
@@ -35,7 +47,7 @@
             .center([0, 39.77]) // Coordinates of the center of the projection
             .rotate([90.09, 0, 1]) // Longitude, Latitude, and roll angles for the reference globe
             .parallels([37.45, 42.22]) // Conic projections need two standard parallels, specifies them
-            .scale(4600) // Map scale, 1:X
+            .scale(7750) // Map scale, 1:X
             .translate([width / 2, height / 2]) // Offsets pixel coordinates in the SVG container.
 
         // GeoPath generator, takes a given geojson and generates repsective SVG path data.
@@ -112,7 +124,7 @@
     // Create color scale
     function createColorScale(csvData) {
         var dataMinMax = getDataValues(csvData, expressed.color) // Calculate minimums and maximums
-        return colorScale = d3.scalePow().exponent(0.5715).range([2, 7]).domain([dataMinMax[0], dataMinMax[1]]) // Creates power scale generator, includes Flannery scaling
+        return colorScale = d3.scalePow().exponent(0.5715).range([5, 10]).domain([dataMinMax[0], dataMinMax[1]]) // Creates power scale generator, includes Flannery scaling
     }
 
     // Create chart axes
@@ -402,12 +414,14 @@
         var labelWidth = d3.select('.infolabel')
             .node() // Returns .infolabel's DOM node
             .getBoundingClientRect().width; // Retrieves the width property of the size of the label
+
         // Use cursor coordinates to set label coordinates
         // event.client_, a d3 object, takes the x and y coordinates of the cursor, originating from the top left of the screen.
+        // window.scrollY prevents the tooltip from drifting vertically when the client scrolls down
         var x1 = event.clientX + 10,
-            y1 = event.clientY - 75,
+            y1 = event.clientY + window.scrollY - 75,
             x2 = event.clientX - labelWidth - 10, // Secondary width, in case the label would overflow to the right
-            y2 = event.clientY + 25; // Likewise, but for overflow to the top
+            y2 = event.clientY + window.scrollY + 25; // Likewise, but for overflow to the top
 
         // Setting horizontal label, checks for overflow to switch between x1 and x2
         var x = event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
