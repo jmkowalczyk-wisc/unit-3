@@ -24,7 +24,7 @@
             height = 460;
 
         // SVG container for map
-        var map = d3.select('body')
+        var map = d3.select('#mapchart-container') // Selecting 'body' causes the chart to appear at the very end of the html, after any other html. Putting the map and the chart in their own div fixes this.
             .append('svg')
             .attr('class', 'map')
             .attr('width', width)
@@ -135,7 +135,7 @@
     // Creates the supplementary coordinated bubble chart
     function setChart (csvData, colorScale){
         // Create svg element to hold the bubble chart
-        var chart = d3.select('body')
+        var chart = d3.select('#mapchart-container') // Selecting 'body' causes the chart to appear at the very end of the html, after any other html. Putting the map and the chart in their own div fixes this.
             .append('svg')
             .attr('width', chartWidth)
             .attr('height', chartHeight)
@@ -156,7 +156,7 @@
             .append('circle') // Append a circle for each entry in csvData, should be ~100 circles
             .attr('class', 'circles')
             .attr('class', function(d){ // Adds two more classes to each circle, bubble and the name of the county
-                return 'bubble ' + d.County;
+                return 'bubble ' + d.County.replace(/ /g, '-'); // Replaces spaces in county names with hyphens, to condense two-word counties to one class.
             })
             .attr('r', function(d){ // Varies the size of the bubbles based on the expressed color variable
                 return radiusScale(parseFloat(d[expressed.color]));
@@ -241,7 +241,7 @@
             .enter() // Needed to process the data
             .append('path') // Adds a <path> element to the existing <svg> element in map
             .attr('class', function(d){ // Adds two classes to each feature: counties, which is selected earlier, and the name of the county.
-                return "counties " + d.properties.COUNTYNAME;
+                return "counties " + d.properties.COUNTYNAME.replace(/ /g, '-'); // Replaces spaces in county names with hyphens, to condense two-word counties to one class.
             })
             .attr('d', path) // Adds path data.
             .style('fill', function(d){ // Sets the fill color based on the color scale established earlier.
@@ -352,9 +352,10 @@
         }
     };
 
+    // Highlight/dehighlight functionality
     function highlight(props) {
         // Add selected class to the selected element
-        var selected = d3.selectAll('.' + props.COUNTYNAME)
+        var selected = d3.selectAll('.' + props.COUNTYNAME.replace(/ /g, '-')) // Replaces spaces in county names with hyphens, to condense two-word counties to one class.)
             .attr('class', function (d){
                 let elemClasses = this.classList; // Get current list of classes for each element
                 elemClasses += ' selected' // Add 'selected' as a class to classList
@@ -365,11 +366,18 @@
 
     function dehighlight(props) {
         // Removes selected class from the selected element.
-        var selected = d3.selectAll('.' + props.COUNTYNAME)
+        var selected = d3.selectAll('.' + props.COUNTYNAME.replace(/ /g, '-'))
             .attr('class', function(){
                 let elemClasses = this.classList; // Get current list of classes for each element
                 elemClasses.remove('selected') // Removes 'selected' from classList
                 return elemClasses; // Replaces the prior classList with the one with 'selected'
             })
     };
+
+    // Dynamic label functionality
+    function setLabel(props) {
+        // Label content
+
+        // Create infolabel div
+    }
 })(); // Must always be the last line. Closes and executes the anonymous function wrapping main.json
