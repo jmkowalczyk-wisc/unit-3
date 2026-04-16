@@ -3,12 +3,19 @@
     
     // Pseudo-global variables, technically local because the entire script is wrapped in one anonymous function.
     // Variables from the BRIC data to join to the county data
-    var attrArray = ["SOCIAL", "ECONOM", "HOUSING/INFRA", "COMM CAPITAL", "INSTITUTIONAL", "ENVIRONMENT"];
+    var attrObjects = [
+        {attr:"SOCIAL", label:'Social Resilience'}, 
+        {attr:"ECONOM", label:'Economic Resilience'}, 
+        {attr:"HOUSING/INFRA", label:'Infrastructure/Housing Resilience'}, 
+        {attr:"COMM CAPITAL", label:'Community Capacity Resilience'}, 
+        {attr:"INSTITUTIONAL", label:'Institutional Resilience'}, 
+        {attr:"ENVIRONMENT", label:'Environmental/Natural Resilience'}
+    ];
     // Object containing different expressed variables
     var expressed = {
-        x: attrArray[2], // x attribute
-        y: attrArray[0], // y attribute
-        color: attrArray[1] // Color and size attribute
+        x: attrObjects[2].attr, // x attribute
+        y: attrObjects[0].attr, // y attribute
+        color: attrObjects[1].attr // Color and size attribute
     }
     // Chart frame dimensions
     // window.innerWidth reads the internal width of the browser frame
@@ -210,9 +217,9 @@
                 // Where primary keys match, transfer the BRIC data to the topojson properties
                 if (countyKey == csvKey) {
                     // Assign attributes and values
-                    attrArray.forEach(function (attr) { // For each object attr in attrArray...
-                        var val = parseFloat(csvCounty[attr]); // Get the csv attribute value
-                        countyProps[attr] = val; // Assign attribute and value to topojson properties
+                    attrObjects.forEach(function (attr) { // For each object attr in attrObjects...
+                        var val = parseFloat(csvCounty[attr.attr]); // Get the csv attribute value
+                        countyProps[attr.attr] = val; // Assign attribute and value to topojson properties
                     });
                 }
             }
@@ -286,6 +293,11 @@
 
     // Create dropdown meny for attribute selection
     function createDropdown(csvData, expressedAttribute, menuLabel) {
+        // Get dropdown label
+        var dropdownLabel // Initialize variable
+        attrObjects.forEach(function(x){ // For each object in attrObjects...
+            if (expressed[expressedAttribute] == x.attr) {dropdownLabel = x.label} // If the expressed attribute = x's .attr attribute, set dropdown label equal to that object's label attribute.
+        })
         // Add dropdown label
         var label = d3.select('.navbar')
             .append('p')
@@ -296,7 +308,7 @@
         var dropdown = d3.select('.navbar') // Selects in navbar tag instead of below the map and chart
             .append('select') // Adds a <select> tag to the DOM, the basis of a dropdown menu
             .attr('class', 'dropdown') // Adds dropdown as the class for the element
-            .on('change', function(){ // When the selected value of the dropdon menu changes...
+            .on('change', function(){ // When the selected value of the dropdown menu changes...
                 changeAttribute(this.value, expressedAttribute, csvData) // ...changes the map and chart to represent the selected attribute.
             });
 
@@ -308,11 +320,11 @@
 
         // Add attribute name options
         var attrOptions = dropdown.selectAll('attrOptions')
-            .data(attrArray) // Imports attribute strings to loop through for generating the options
+            .data(attrObjects) // Imports attribute strings to loop through for generating the options
             .enter() // Needed for .data()
             .append('option') // Adds an <option> tag to each item in the array
-            .attr('value', function(d) {return d})
-            .text(function(d) {return d})
+            .attr('value', function(d) {return d.attr})
+            .text(function(d) {return d.label})
 
         // Dropdown change event handler
         function changeAttribute(attribute, expressedAttribute, csvData) {
