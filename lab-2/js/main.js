@@ -4,12 +4,12 @@
     // Pseudo-global variables, technically local because the entire script is wrapped in one anonymous function.
     // Variables from the BRIC data to join to the county data
     var attrObjects = [
-        {attr:"SOCIAL", label:'Social Resilience'}, 
-        {attr:"ECONOM", label:'Economic Resilience'}, 
-        {attr:"HOUSING/INFRA", label:'Infrastructure/Housing Resilience'}, 
-        {attr:"COMM CAPITAL", label:'Community Capacity Resilience'}, 
-        {attr:"INSTITUTIONAL", label:'Institutional Resilience'}, 
-        {attr:"ENVIRONMENT", label:'Environmental/Natural Resilience'}
+        {attr:"SOCIAL", label:'Social Resilience Index'}, 
+        {attr:"ECONOM", label:'Economic Resilience Index'}, 
+        {attr:"HOUSING/INFRA", label:'Infrastructure/Housing Resilience Index'}, 
+        {attr:"COMM CAPITAL", label:'Community Capacity Resilience Index'}, 
+        {attr:"INSTITUTIONAL", label:'Institutional Resilience Index'}, 
+        {attr:"ENVIRONMENT", label:'Environmental/Natural Resilience Index'}
     ];
     // Object containing different expressed variables
     var expressed = {
@@ -98,9 +98,9 @@
 
             setChart(csvData, colorScale); // Creates the bubble chart
             createTitle();
-            createDropdown(csvData, 'color', 'Select Color/Size:');
-            createDropdown(csvData, 'x', 'Select X:');
-            createDropdown(csvData, 'y', 'Select Y:');
+            createDropdown(csvData, 'color', 'Select Color/Size Index:');
+            createDropdown(csvData, 'x', 'Select X Index:');
+            createDropdown(csvData, 'y', 'Select Y Index:');
         }
     }
 
@@ -189,7 +189,6 @@
             .attr('fill', function(d){ // Varies the color of the bubbles based on the expressed color variable
                 return colorScale(parseFloat(d[expressed.color]));
             })
-            .attr('opacity', 0.7) // Might be temporary, circles tend to overlap even with the dynamic x and y scales
             .on("mouseover", function (event, d) {
                 d.COUNTYNAME = d.County // Name of county is COUNTYNAME in the topojson, but County in the csv. Setting d.COUNTYNAME equal to d.County fixes this.
                 highlight(d); 
@@ -230,26 +229,21 @@
     // Creates color scale generator
     function makeColorScale(data) {
         // Establish array of colors to be iterated between
-        var colorClasses = [             
-            '#ffffcc',
-            '#c2e699',
-            '#78c679',
-            '#31a354',
-            '#006837' 
-        ];
+        var colorClasses = [
+            '#ffffe5', 
+            '#f7fcb9', 
+            '#d9f0a3', 
+            '#addd8e', 
+            '#78c679', 
+            '#5eb96b', 
+            '#41ab5d', 
+            '#238443', 
+            '#006837', 
+            '#004529'];
         // Creates the d3 generator for the scale
         var colorScale = d3.scaleQuantile()
-            .range(colorClasses); // Maximum range of the scale's output, i.e., can only output within the five values set in colorClasses
-
-        // Build array of all values of the currently expressed attribute
-        var domainArray = [];
-        for (var i = 0; i < data.length; i++) { // For each row i in the provided data...
-            var val = parseFloat(data[i][expressed.color]) // Converts the string data in the current row and expressed attribute to a float
-            domainArray.push(val); // Adds the current float from the loop to the end of domainArray
-        };
-
-        // Assign array of expressed values of as the domain of the scale
-        colorScale.domain(domainArray);
+            .range(colorClasses) // Maximum range of the scale's output, i.e., can only output within the five values set in colorClasses
+            .domain([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]); // Domain and breaks are hard-coded instead of using an adjustable array due to every attribute lying between 0 and 1. Adjusting the array based on the max and min values of the expressed attribute overexaggerates very small differences.
 
         // Return the completed color scale
         return colorScale
@@ -323,8 +317,8 @@
             .data(attrObjects) // Imports attribute strings to loop through for generating the options
             .enter() // Needed for .data()
             .append('option') // Adds an <option> tag to each item in the array
-            .attr('value', function(d) {return d.attr})
-            .text(function(d) {return d.label})
+            .attr('value', function(d) {return d.attr}) // Sets the value of each option in the dropdown to the .attr attribute in the respective AttrOptions object
+            .text(function(d) {return d.label}) // Likewise, but sets the displayed text for the option as the .label attribute.
 
         // Dropdown change event handler
         function changeAttribute(attribute, expressedAttribute, csvData) {
@@ -337,7 +331,7 @@
             var colorScale = makeColorScale(csvData);
             var radiusScale = createColorScale(csvData);
 
-            // Update axes, calls the d3.axis___ methods with the new scales.
+            // Update axes, calls the d3.axis___ methods with the new scales to visually update them whenever an attribute is changed.
             var xaxis = d3.select('.xaxis').call(
                 d3.axisTop(xScale)
             )
@@ -409,9 +403,16 @@
 
     // Dynamic label functionality
     function setLabel(props) {
+        // Gets the label of the expressed variable from attrObjects.
+        var labelText = expressed.color 
+        attrObjects.forEach(function(x) {
+            if (expressed.color == x.attr) {
+                labelText = x.label
+            }
+        })
         // Set up label content, backticks avoid string concatenation and makes it more readable.
-        // Format: Expressed attribute value | County name | Expressed attribute name
-            var labelAttr = `<h1>${props[expressed.color]}</h1><b>${props.COUNTYNAME} ${expressed.color}</b>`
+        // Format: Expressed attribute value | County name | Expressed attribute name label
+            var labelAttr = `<h1>${props[expressed.color]}</h1><b>${props.COUNTYNAME} County ${labelText}</b>`
         // Create infolabel div via an html string
             var infolabel = d3.select('body')
                 .append('div')

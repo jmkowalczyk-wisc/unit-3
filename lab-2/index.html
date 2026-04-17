@@ -20,7 +20,24 @@
         <!--put your initial page content here-->
         <div class = 'navbar'></div>
         <div id = 'mapchart-container'></div>
-        <p>text</p>
+        <div class = "legend"></div>
+        <div class = 'supplemental'>
+            <p><span class='bold'>How to use: </span>Hover over counties or chart points to highlight the opposite view's respective data. Use the dropdown menus in the navigation bar to change the expressed attributes.</p>
+            <hr>
+            <h3>What is this data?</h3>
+            <p>The <a href="https://sc.edu/study/colleges_schools/artsandsciences/centers_and_institutes/hvri/data_and_resources/bric/">Baseline Resilience Indicators for Communities Index</a> is a dataset constructed by the University of South Carolina to highlight six different categories of natural disaster resilience on a county level. The BRIC dataset contains six categories of 49 aggregated variables from 2010, 2015, and 2020 as of present, but this site represents only the 2020 data for Illinois. Index values range from 0 to 1, with 0 being not resilient in a category, and 1 being very resilient.</p>
+            <hr>
+            <h3>Resilience Type Summaries</h3>
+            <p>Below is a brief summary of the six resilience types included in this site. More thorough descriptions are listed on the BRIC homepage, linked above. A full summary of the 49 variables involved in calculating each index and how they attribute to them can be found <a href="https://sc.edu/study/colleges_schools/artsandsciences/centers_and_institutes/hvri/documents/bric/cbric_2020.pdf">here</a>, as a PDF included on the BRIC homepage.</p>
+            <ul>
+                <li><span class="bold">Social/Cultural/Human Wellbeing: </span>Physical attributes regarding populations and their values. Includes quality of education, transporation access, health insurance access, etc.</li>
+                <li><span class="bold">Economic/Financial: </span>Economic assets. Includes homeownership, employment rate, income inequality, etc.</li>
+                <li><span class="bold">Infrastructure/Housing: </span>Buildings and infrastructure. Includes structure sturdiness, availability of housing, evacuation routes, temporary shelter availability, etc.</li>
+                <li><span class="bold">Institutional/Governance: </span> Access to resources and the ability to influence their distribution. Includes flood insurance coverage, disaster aid experience, nuclear accident planning, etc. </li>
+                <li><span class="bold">Community Capacity: </span>Social networks and connections between individuals and communities. Includes volunteering rates, political engagement, civic organizations, etc.</li>
+                <li><span class="bold">Environmental/Natural: </span>Natural resource use and environmental conditions. Includes food supplies, water stress, energy use, etc.</li>
+            </ul>
+        </div>
         <!--put your external script links here-->
         <script src="lib/d3.js"></script>
         <script src="lib/topojson.js"></script>

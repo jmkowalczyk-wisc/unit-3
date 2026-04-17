@@ -1,5 +1,9 @@
 /* Activity 10 Stylesheet - Joseph Kowalczyk, 2026 */
 
+body { /*Background color for the entire site*/
+    background-color: #F8F9FA;
+}
+
 .states {
     fill: #f0f0f0; /* Sets the fill color of the states class to white */
     stroke: #ccc; /* Sets the stroke/line color of the states class to light grey */
@@ -18,9 +22,14 @@
 }
 
 .chart {
-    background-color: rgba(128, 128, 128, .2); /* Adds a background color to the entire chart <svg> */
+    background-color: #e1e2e4; /* Adds a background color to the entire chart <svg> */
     border: medium solid #999; /* Adds a border to the entire chart <svg> */
     margin: 5px 20px 0 0; /* Moves the chart <svg> away from the edge of the window */
+}
+
+.bubble {
+    stroke: #000; /*Outline color*/
+    stroke-width: .5px; /*Outline width*/
 }
 
 .navbar {
@@ -47,27 +56,45 @@ option {
 
 .dropdown-label {
     display: inline; /* Displays label as an inline element.*/
+    font-family: 'Inter', sans-serif;
 }
 
-.infolabel {
+.infolabel { /* Styling of the entire dynamic label */
     position: absolute;
     height: 50px;
-    min-width: 100px;
+    min-width: 100px; /*Sets a minimum width for the svg. The label can be now smaller than 100px, but it can be larger.*/
     color: #fff;
     background-color: #000;
     border: solid thin #fff;
     padding: 5px 10px;
+    font-family: sans-serif;
 }
 
-.infolabel h1 {
+.infolabel h1 { /* Styling of the dynamic label's value only. */
+    font-family: monospace;
     margin: 0 20px 0 0;
     padding: 0;
     display: inline-block;
     line-height: 1em;
 }
 
+.pageTitle, h3{ /*General styling for headers, mainly the title and supplemental headers*/
+    font-family: sans-serif;
+}
+
+.supplemental { /*General styling for the supplemental content beneath the map*/
+    width: 65%;
+    margin: 0 auto;
+    color: #2c3e50;
+    font-family: sans-serif;
+}
+
+.bold { /* Bolds text. Used for descriptive subheaders that don't necessarily need an <h_> tag.*/
+    font-weight: bold;
+}
+
 /* .selected must be under all other styles for priority reasons */
 .selected {
-    stroke: goldenrod; /* sets outline color */
+    stroke: orange; /* sets outline color */
     stroke-width: 2px; /* changes outline width */
 }
