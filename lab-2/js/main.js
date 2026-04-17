@@ -286,9 +286,10 @@
         var pagetitle = d3.select('.navbar') // Places title inside the navbar div
             .append('h1') // Adds header 1 as the html tag
             .attr('class', 'pageTitle')
-            .text('Baseline Resilience Indicators for Communities Dashboard')
+            .text('Illinois Baseline Resilience Indicators for Communities (BRIC) Dashboard')
 
-        var subtitle = d3.select('.navbar')
+        // Likewise, but adds a subtitle beneath the title.
+        var subtitle = d3.select('.navbar') 
             .append('h2')
             .attr('class', 'pageSubtitle')
             .text('by Joseph Kowalczyk, last updated 4/17/26')
