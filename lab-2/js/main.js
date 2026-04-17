@@ -229,22 +229,26 @@
     // Creates color scale generator
     function makeColorScale(data) {
         // Establish array of colors to be iterated between
-        var colorClasses = [
-            '#ffffe5', 
-            '#f7fcb9', 
-            '#d9f0a3', 
-            '#addd8e', 
-            '#78c679', 
-            '#5eb96b', 
-            '#41ab5d', 
-            '#238443', 
-            '#006837', 
-            '#004529'];
+        var colorClasses = [             
+            '#ffffcc',
+            '#c2e699',
+            '#78c679',
+            '#31a354',
+            '#006837' 
+        ];
         // Creates the d3 generator for the scale
         var colorScale = d3.scaleQuantile()
-            .range(colorClasses) // Maximum range of the scale's output, i.e., can only output within the five values set in colorClasses
-            .domain([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]); // Domain and breaks are hard-coded instead of using an adjustable array due to every attribute lying between 0 and 1. Adjusting the array based on the max and min values of the expressed attribute overexaggerates very small differences.
+            .range(colorClasses); // Maximum range of the scale's output, i.e., can only output within the five values set in colorClasses
 
+        // Build array of all values of the currently expressed attribute
+        var domainArray = [];
+        for (var i = 0; i < data.length; i++) { // For each row i in the provided data...
+            var val = parseFloat(data[i][expressed.color]) // Converts the string data in the current row and expressed attribute to a float
+            domainArray.push(val); // Adds the current float from the loop to the end of domainArray
+        };
+
+        // Assign array of expressed values of as the domain of the scale
+        colorScale.domain(domainArray);
         // Return the completed color scale
         return colorScale
     };
@@ -283,6 +287,11 @@
             .append('h1') // Adds header 1 as the html tag
             .attr('class', 'pageTitle')
             .text('Baseline Resilience Indicators for Communities Dashboard')
+
+        var subtitle = d3.select('.navbar')
+            .append('h2')
+            .attr('class', 'pageSubtitle')
+            .text('by Joseph Kowalczyk, last updated 4/17/26')
     }
 
     // Create dropdown meny for attribute selection

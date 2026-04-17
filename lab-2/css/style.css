@@ -63,9 +63,9 @@ option {
     position: absolute;
     height: 50px;
     min-width: 100px; /*Sets a minimum width for the svg. The label can be now smaller than 100px, but it can be larger.*/
-    color: #fff;
-    background-color: #000;
-    border: solid thin #fff;
+    color: #000;
+    background-color: #fff;
+    border: solid thin #999;
     padding: 5px 10px;
     font-family: sans-serif;
 }
@@ -78,8 +78,13 @@ option {
     line-height: 1em;
 }
 
-.pageTitle, h3{ /*General styling for headers, mainly the title and supplemental headers*/
+.pageTitle, .pageSubtitle, h3{ /*General styling for headers, mainly the title and supplemental headers*/
     font-family: sans-serif;
+}
+
+.pageSubtitle { /*Styling for subtitle, reducing font size and coloring more towards grey.*/
+    font-size: 15px;
+    color: grey;
 }
 
 .supplemental { /*General styling for the supplemental content beneath the map*/
